@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Tampilan Data - Aplikasi Laundry{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Tampilan Data Laundry</h1>
+            <p class="text-sm text-slate-500">Laporan transparansi catatan pemasukan, pengeluaran, dan keuntungan.</p>
+        </div>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-700 w-fit">
+            Mode Lihat Saja (Read-Only)
+        </span>
+    </div>
+
+    <!-- Kartu Ringkasan Keuangan -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Pemasukan</p>
+            <p class="text-2xl font-bold text-emerald-600 mt-2">{{ total_pemasukan | rupiah }}</p>
+        </div>
+
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+            <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Pengeluaran</p>
+            <p class="text-2xl font-bold text-rose-600 mt-2">{{ total_pengeluaran | rupiah }}</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-slate-900 to-blue-950 rounded-xl border border-slate-800 p-6 shadow-sm text-white">
+            <p class="text-xs font-semibold uppercase tracking-wider text-sky-300">Keuntungan Bersih</p>
+            <p class="text-2xl font-bold mt-2 {% if keuntungan < 0 %}text-rose-400{% else %}text-white{% endif %}">
+                {{ keuntungan | rupiah }}
+            </p>
+        </div>
+    </div>
+
+    <!-- Tabel Data Transaksi -->
+    <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div class="px-6 py-4 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <h2 class="text-base font-bold text-slate-900">Data Catatan Transaksi</h2>
+
+            <div class="flex items-center gap-2 text-xs font-semibold">
+                <a href="{{ url_for('dashboard_pelanggan', jenis='semua') }}"
+                   class="px-3 py-1.5 rounded-lg transition {% if filter_jenis == 'semua' %}bg-slate-900 text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+                    Semua
+                </a>
+                <a href="{{ url_for('dashboard_pelanggan', jenis='pemasukan') }}"
+                   class="px-3 py-1.5 rounded-lg transition {% if filter_jenis == 'pemasukan' %}bg-emerald-600 text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+                    Pemasukan
+                </a>
+                <a href="{{ url_for('dashboard_pelanggan', jenis='pengeluaran') }}"
+                   class="px-3 py-1.5 rounded-lg transition {% if filter_jenis == 'pengeluaran' %}bg-rose-600 text-white{% else %}bg-slate-100 text-slate-600 hover:bg-slate-200{% endif %}">
+                    Pengeluaran
+                </a>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500">
+                        <th class="px-6 py-3 font-semibold">Tanggal</th>
+                        <th class="px-6 py-3 font-semibold">Jenis</th>
+                        <th class="px-6 py-3 font-semibold">Kategori</th>
+                        <th class="px-6 py-3 font-semibold">Keterangan</th>
+                        <th class="px-6 py-3 font-semibold text-right">Nominal</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-sm">
+                    {% for item in transaksi %}
+                    <tr class="hover:bg-slate-50/80 transition">
+                        <td class="px-6 py-3.5 text-slate-600 whitespace-nowrap">{{ item.tanggal }}</td>
+                        <td class="px-6 py-3.5 whitespace-nowrap">
+                            {% if item.jenis == 'pemasukan' %}
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">Pemasukan</span>
+                            {% else %}
+                                <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200">Pengeluaran</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-3.5 font-medium text-slate-800">{{ item.kategori }}</td>
+                        <td class="px-6 py-3.5 text-slate-600">{{ item.keterangan }}</td>
+                        <td class="px-6 py-3.5 text-right font-semibold whitespace-nowrap {% if item.jenis == 'pemasukan' %}text-emerald-600{% else %}text-rose-600{% endif %}">
+                            {{ item.nominal | rupiah }}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="5" class="px-6 py-10 text-center text-slate-400">Belum ada data transaksi.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
